@@ -2,7 +2,7 @@
 const fetch = require('node-fetch');
 const filmID = process.argv[2];
 
-async function starwarsCharacters(filmId) {
+async function starwarsCharacters (filmId) {
   const endpoint = 'https://swapi-api.hbtn.io/api/films/' + filmId;
 
   try {
