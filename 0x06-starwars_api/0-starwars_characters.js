@@ -1,19 +1,28 @@
 #!/usr/bin/node
-const util = require('util');
-const request = util.promisify(require('request'));
+const fetch = require('node-fetch');
 const filmID = process.argv[2];
 
-async function starwarsCharacters (filmId) {
+async function starwarsCharacters(filmId) {
   const endpoint = 'https://swapi-api.hbtn.io/api/films/' + filmId;
-  let response = await (await request(endpoint)).body;
-  response = JSON.parse(response);
-  const characters = response.characters;
 
-  for (let i = 0; i < characters.length; i++) {
-    const urlCharacter = characters[i];
-    let character = await (await request(urlCharacter)).body;
-    character = JSON.parse(character);
-    console.log(character.name);
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      throw new Error(`Error fetching film data: ${response.statusText}`);
+    }
+    const filmData = await response.json();
+    const characters = filmData.characters;
+
+    for (const url of characters) {
+      const charResponse = await fetch(url);
+      if (!charResponse.ok) {
+        throw new Error(`Error fetching character data: ${charResponse.statusText}`);
+      }
+      const character = await charResponse.json();
+      console.log(character.name);
+    }
+  } catch (error) {
+    console.error(error.message);
   }
 }
 
